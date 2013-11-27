@@ -1,3 +1,10 @@
+shellinabox (2.14-1drxzcl1) unstable; urgency=low
+
+  * Fix issue #245 from issue tracker on upstream
+  * Add "paste from browser" patch
+
+ -- drxzcl <drxzclx@gmail.com>  Wed, 27 Nov 2013 14:28:00 +0100
+
 shellinabox (2.14-1) unstable; urgency=low
 
   * Revised install target of debian/rules.

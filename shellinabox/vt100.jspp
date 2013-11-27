@@ -175,7 +175,7 @@ function VT100(container) {
   }
   this.getUserSettings();
   this.initializeElements(container);
-  this.maxScrollbackLines = 500;
+  this.maxScrollbackLines = 2000;
   this.npar               = 0;
   this.par                = [ ];
   this.isQuestionMark     = false;
@@ -1157,8 +1157,12 @@ VT100.prototype.resizer = function() {
   // still get confused if somebody enters a character that is wider/narrower
   // than normal. This can happen if the browser tries to substitute a
   // characters from a different font.
+  if(this.cursorWidth >0) {
   this.cursor.style.width      = this.cursorWidth  + 'px';
+  }
+  if(this.cursorHeight >0) {
   this.cursor.style.height     = this.cursorHeight + 'px';
+  }
 
   // Adjust height for one pixel padding of the #vt100 element.
   // The latter is necessary to properly display the inactive cursor.
@@ -1531,8 +1535,20 @@ VT100.prototype.insertBlankLine = function(y, color, style) {
 };
 
 VT100.prototype.updateWidth = function() {
-  this.terminalWidth = Math.floor(this.console[this.currentScreen].offsetWidth/
-                                  this.cursorWidth*this.scale);
+  //  if the cursorWidth is zero, something is wrong.  Try to get it some other way.
+  if(this.cursorWidth <=0 ) {
+    if(this.cursor.clientWidth<=0) {
+        // Rats, this.cursor.clientWidth is zero too.  Best guess?
+        this.terminalWidth = 80;
+    } else {
+      // update the size.
+      this.cursorWidth = this.cursor.clientWidth;
+      this.terminalWidth = Math.floor(this.console[this.currentScreen].offsetWidth/this.cursorWidth*this.scale);
+    }
+  } else {
+    this.terminalWidth = Math.floor(this.console[this.currentScreen].offsetWidth/this.cursorWidth*this.scale);
+  }
+
   return this.terminalWidth;
 };
 
@@ -2321,6 +2337,13 @@ VT100.prototype.pasteFnc = function() {
   }
 };
 
+VT100.prototype.pasteBrowserFnc = function() {
+  var clipboard     = prompt("Paste into this box:","");
+  if (clipboard != undefined) {
+     return this.keysPressed('' + clipboard);
+  }
+};
+
 VT100.prototype.toggleUTF = function() {
   this.utfEnabled   = !this.utfEnabled;
 
@@ -2426,6 +2449,7 @@ VT100.prototype.showContextMenu = function(x, y) {
         '<ul id="menuentries">' +
           '<li id="beginclipboard">Copy</li>' +
           '<li id="endclipboard">Paste</li>' +
+          '<li id="browserclipboard">Paste from browser</li>' +
           '<hr />' +
           '<li id="reset">Reset</li>' +
           '<hr />' +
@@ -2467,7 +2491,7 @@ VT100.prototype.showContextMenu = function(x, y) {
   }
 
   // Actions for default items
-  var actions                 = [ this.copyLast, p, this.reset,
+  var actions                 = [ this.copyLast, p, this.pasteBrowserFnc, this.reset,
                                   this.toggleUTF, this.toggleBell,
                                   this.toggleSoftKeyboard,
                                   this.toggleCursorBlinking ];
