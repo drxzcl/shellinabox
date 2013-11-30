@@ -1230,7 +1230,11 @@ clean-local:
 	        shellinabox/root_page.h     				      \
 	        shellinabox/shell_in_a_box.h				      \
 	        shellinabox/styles.h                                          \
-	        shellinabox/vt100.h
+	        shellinabox/vt100.h					      \
+		shellinabox/vt100.js                                          \
+		shellinabox/shell_in_a_box.js				      \
+		demo/demo.js						      \
+		demo/vt100.js
 
 .css.h:
 	@echo od "$<" '>'"$@"
