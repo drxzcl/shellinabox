@@ -1159,12 +1159,9 @@ static void parseArgs(int argc, char * const argv[]) {
   }
 
   if (demonize) {
-    pid_t pid;
-    check((pid             = fork()) >= 0);
-    if (pid) {
-      _exit(0);
+    if (daemon(0, 0) < 0) {
+       fatal("Failed to daemonize: %s", strerror(errno));
     }
-    setsid();
   }
   if (pidfile) {
 #ifndef O_LARGEFILE
